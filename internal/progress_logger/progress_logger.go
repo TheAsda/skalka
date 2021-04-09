@@ -6,35 +6,47 @@ import (
 )
 
 type ProgressLogger struct {
-	writer  io.Writer
-	reader  io.Reader
-	jobName string
-	total   int
-	current int
+	writer io.Writer
+	reader io.Reader
 }
 
-func NewProgressLogger(writer io.Writer, reader io.Reader, jobName string, total int) *ProgressLogger {
-	return &ProgressLogger{writer: writer, reader: reader, jobName: jobName, total: total, current: 1}
+func (l *ProgressLogger) GetStepLogger(jobName string, total int) *StepLogger {
+	return NewStepLogger(l.writer, l.reader, jobName, total)
 }
 
-func (l *ProgressLogger) LogInfo(message string) {
-
-}
-
-func (l *ProgressLogger) LogStep(name string) error {
-	msg := l.formatStep(name)
+func (l *ProgressLogger) Info(message string) error {
+	msg := l.formatLog(Info, message)
 	_, err := l.writer.Write([]byte(msg))
-	l.nextStep()
 	return err
 }
 
-func (l *ProgressLogger) formatStep(name string) string {
-	return fmt.Sprintf("[%s] %d/%d: %s", l.jobName, l.current, l.total, name)
+func (l *ProgressLogger) Warn(message string) error {
+	msg := l.formatLog(Warn, message)
+	_, err := l.writer.Write([]byte(msg))
+	return err
 }
 
-func (l *ProgressLogger) nextStep() {
-	if l.current == l.total {
-		panic("Step limit reached")
+func (l *ProgressLogger) Error(message string) error {
+	msg := l.formatLog(Error, message)
+	_, err := l.writer.Write([]byte(msg))
+	return err
+}
+
+const (
+	Info  = iota
+	Warn  = iota
+	Error = iota
+)
+
+func (l *ProgressLogger) formatLog(messageType int, message string) string {
+	switch messageType {
+	case Info:
+		return fmt.Sprintf("Info: %s", message)
+	case Warn:
+		return fmt.Sprintf("Warn: %s", message)
+	case Error:
+		return fmt.Sprintf("Error: %s", message)
+	default:
+		panic("Unknown message type")
 	}
-	l.current += 1
 }
