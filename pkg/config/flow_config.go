@@ -3,7 +3,7 @@ package config
 // Description of a flow that can be executed
 type FlowConfig struct {
 	// Config version that is meant to exist for backwards compatibility
-	Version int
+	Version float32
 	// Global envs that will be provided for every step
 	Env Env
 	// Required tools for the flow
@@ -37,9 +37,9 @@ type Job struct {
 // One action that should be executed after previous Step completed
 type Step struct {
 	// If defined step is treated as question contained and Run must not be provided
-	StepWithOptions
+	StepWithOptions `yaml:",inline"`
 	// If defined step runs plugin and must not have Run
-	StepPlugin
+	StepPlugin `yaml:",inline"`
 	// Name of the action
 	Name string
 	// Environment variables for the step
