@@ -4,9 +4,12 @@ import "fmt"
 
 type Error struct {
 	Message string
-	Scope   string
+}
+
+func NewError(message string) Error {
+	return Error{Message: message}
 }
 
 func (e Error) Error() string {
-	return fmt.Sprintf("[%s]: %s", e.Scope, e.Message)
+	return fmt.Sprintf("%s", e.Message)
 }
