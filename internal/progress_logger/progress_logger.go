@@ -10,6 +10,10 @@ type ProgressLogger struct {
 	reader io.Reader
 }
 
+func NewProgressLogger(writer io.Writer, reader io.Reader) *ProgressLogger {
+	return &ProgressLogger{writer: writer, reader: reader}
+}
+
 func (l *ProgressLogger) GetStepLogger(jobName string, total int) *StepLogger {
 	return NewStepLogger(l.writer, l.reader, jobName, total)
 }
