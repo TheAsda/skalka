@@ -10,13 +10,17 @@ type VariablesStore struct {
 	storage map[string]string
 }
 
+func NewVariablesStore() *VariablesStore {
+	return &VariablesStore{storage: map[string]string{}}
+}
+
 func (s *VariablesStore) Exists(name string) bool {
 	for key, _ := range s.storage {
 		if key == name {
 			return true
 		}
 	}
-	return true
+	return false
 }
 
 func (s *VariablesStore) Add(name string, value string) error {
