@@ -8,12 +8,12 @@ import (
 )
 
 func TestTransactionManager_GetPath(t *testing.T) {
-	t.Run("get path tmp", func(t *testing.T) {
+	t.Run("get targetPath tmp", func(t *testing.T) {
 		tempPath := t.TempDir()
 		manager := NewTransactionManager(tempPath, true)
 		p, err := manager.GetPath()
 		if err != nil {
-			t.Errorf("Cannot get path: %s", err.Error())
+			t.Errorf("Cannot get targetPath: %s", err.Error())
 			return
 		}
 		if p == tempPath {
@@ -21,16 +21,16 @@ func TestTransactionManager_GetPath(t *testing.T) {
 		}
 	})
 
-	t.Run("get path", func(t *testing.T) {
+	t.Run("get targetPath", func(t *testing.T) {
 		tempPath := t.TempDir()
 		manager := NewTransactionManager(tempPath, false)
 		p, err := manager.GetPath()
 		if err != nil {
-			t.Errorf("Cannot get path: %s", err.Error())
+			t.Errorf("Cannot get targetPath: %s", err.Error())
 			return
 		}
 		if p != tempPath {
-			t.Errorf("Get path must return path if isTmp is false")
+			t.Errorf("Get targetPath must return targetPath if isTmp is false")
 		}
 	})
 }
@@ -41,7 +41,7 @@ func TestTransactionManager_Commit(t *testing.T) {
 		manager := NewTransactionManager(tempPath, true)
 		p, err := manager.GetPath()
 		if err != nil {
-			t.Errorf("Cannot get path: %s", err.Error())
+			t.Errorf("Cannot get targetPath: %s", err.Error())
 			return
 		}
 		file, err := os.Create(path.Join(p, "file.txt"))
@@ -78,7 +78,7 @@ func TestTransactionManager_Rollback(t *testing.T) {
 		manager := NewTransactionManager(tempPath, true)
 		p, err := manager.GetPath()
 		if err != nil {
-			t.Errorf("Cannot get path: %s", err.Error())
+			t.Errorf("Cannot get targetPath: %s", err.Error())
 			return
 		}
 		file, err := os.Create(path.Join(p, "file.txt"))
