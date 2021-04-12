@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"time"
 )
 
 type TransactionManager struct {
@@ -19,15 +20,20 @@ func NewTransactionManager(path string, isTmp bool) *TransactionManager {
 	return &TransactionManager{path: path, isTmp: isTmp, tmpPath: os.TempDir()}
 }
 
-func (m *TransactionManager) getTempDir() string {
+func (m *TransactionManager) getTempDir() (string, error) {
+	rand.Seed(time.Now().UnixNano())
 	folderName := rand.Int()
 	m.tmpDir = path.Join(m.tmpPath, strconv.Itoa(folderName))
-	return m.tmpDir
+	err := os.Mkdir(m.tmpDir, 0777)
+	if err != nil {
+		return "", err
+	}
+	return m.tmpDir, nil
 }
 
-func (m *TransactionManager) GetPath() string {
+func (m *TransactionManager) GetPath() (string, error) {
 	if m.isTmp == false {
-		return m.path
+		return m.path, nil
 	}
 	return m.getTempDir()
 }
@@ -64,6 +70,6 @@ func (m *TransactionManager) Rollback() error {
 	if !m.isTmp {
 		return nil
 	}
-	err := os.Remove(m.tmpDir)
+	err := os.RemoveAll(m.tmpDir)
 	return err
 }
