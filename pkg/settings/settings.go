@@ -1,5 +1,5 @@
 package settings
 
 type Settings struct {
-	LogLevel string `yaml:"log_level"`
+	LogLevel LogLevelType `yaml:"log_level"`
 }

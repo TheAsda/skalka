@@ -22,7 +22,7 @@ func NewTask(name string, command string, stdout io.Writer, stderr io.Writer, en
 func (t *Task) Execute() error {
 	c := exec.Command("cmd", "/C", t.command)
 	c.Stdout = t.stdout
-	c.Stdout = t.stderr
+	c.Stderr = t.stderr
 	c.Env = t.env
 	c.Dir = t.dir
 	err := c.Run()

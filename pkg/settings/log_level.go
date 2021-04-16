@@ -1,9 +1,11 @@
 package settings
 
+type LogLevelType = string
+
 const (
-	Verbose = "verbose"
-	Debug   = "debug"
-	Info    = "info"
-	Warn    = "warn"
-	Error   = "error"
+	Error   LogLevelType = "error"
+	Warn    LogLevelType = "warn"
+	Info    LogLevelType = "info"
+	Debug   LogLevelType = "debug"
+	Verbose LogLevelType = "verbose"
 )

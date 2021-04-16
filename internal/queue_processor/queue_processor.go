@@ -1,7 +1,6 @@
 package queue_processor
 
 import (
-	"github.com/TheAsda/skalka/internal"
 	"github.com/TheAsda/skalka/internal/progress_logger"
 	"github.com/TheAsda/skalka/pkg/config"
 	"os"
@@ -9,22 +8,19 @@ import (
 )
 
 type QueueProcessor struct {
-	queues      map[string]Queue
-	wg          sync.WaitGroup
-	errors      map[string]error
-	logger      progress_logger.ProgressLogger
-	stepLoggers map[string]*progress_logger.StepLogger
-	workdir     string
+	queues  map[string]Queue
+	wg      sync.WaitGroup
+	errors  map[string]error
+	logger  progress_logger.ProgressLogger
+	workdir string
 }
 
 func (p *QueueProcessor) FillQueues(jobs config.Jobs) {
 	for name, job := range jobs {
-		queue := NewQueue()
-		logger := p.logger.GetStepLogger(name, len(job.Steps))
-		p.stepLoggers[name] = logger
+		queue := NewQueue(p.logger)
 		for _, step := range job.Steps {
 			env := append(os.Environ(), step.Env...)
-			queue.Add(*NewTask(step.Name, step.Run, logger.GetStdout(), logger.GetStderr(), env, p.workdir))
+			queue.Add(*NewTask(step.Name, step.Run, p.logger.GetStdout(), p.logger.GetStderr(), env, p.workdir))
 		}
 		p.queues[name] = *queue
 	}
@@ -33,11 +29,16 @@ func (p *QueueProcessor) FillQueues(jobs config.Jobs) {
 func (p *QueueProcessor) Start() {
 	for job, queue := range p.queues {
 		p.wg.Add(1)
-		go func(queue Queue, job string) {
+		go func(queue Queue, jobName string) {
 			defer p.wg.Done()
-			err := p.RunQueue(job, queue)
+			err := p.logger.LogJob(jobName)
 			if err != nil {
-				p.errors[job] = err
+				p.errors[jobName] = err
+				return
+			}
+			err = p.RunQueue(queue)
+			if err != nil {
+				p.errors[jobName] = err
 			}
 		}(queue, job)
 	}
@@ -48,17 +49,9 @@ func (p *QueueProcessor) Wait() map[string]error {
 	return p.errors
 }
 
-func (p *QueueProcessor) RunQueue(name string, queue Queue) error {
-	logger := p.stepLoggers[name]
-	if logger == nil {
-		return internal.NewError("Step logger is not defined")
-	}
+func (p *QueueProcessor) RunQueue(queue Queue) error {
 	for queue.IsEmpty() {
-		err := logger.LogStep("Next step")
-		if err != nil {
-			return err
-		}
-		err = queue.ExecuteNext()
+		err := queue.ExecuteNext()
 		if err != nil {
 			return err
 		}
