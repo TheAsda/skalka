@@ -12,9 +12,6 @@ type FlowConfig struct {
 	Jobs Jobs
 }
 
-// Environment variables that will be provided to a step
-type Env = []string
-
 // Required tool that will be checked for before running jobs
 type Requirement struct {
 	// Command that must be executed and end with code 0
