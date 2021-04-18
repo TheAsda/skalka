@@ -13,10 +13,11 @@ type Queue struct {
 	tm       transaction_manager.TransactionManager
 	IsFailed bool
 	config   config.GlobalConfig
+	runner   Runner
 }
 
-func NewQueue(logger progress_logger.ProgressLogger, manager transaction_manager.TransactionManager, globalConfig config.GlobalConfig) *Queue {
-	return &Queue{queue: []Task{}, logger: logger, current: 0, tm: manager, IsFailed: false, config: globalConfig}
+func NewQueue(logger progress_logger.ProgressLogger, manager transaction_manager.TransactionManager, globalConfig config.GlobalConfig, runner Runner) *Queue {
+	return &Queue{queue: []Task{}, logger: logger, current: 0, tm: manager, IsFailed: false, config: globalConfig, runner: runner}
 }
 
 func (q *Queue) Add(step config.Step) error {
@@ -26,7 +27,7 @@ func (q *Queue) Add(step config.Step) error {
 		q.logger.Error(err.Error())
 		return err
 	}
-	q.queue = append(q.queue, *NewTask(step.Name, step.Run, q.logger.GetStdout(), q.logger.GetStderr(), env, path))
+	q.queue = append(q.queue, *NewTask(step.Name, step.Run, q.logger.GetStdout(), q.logger.GetStderr(), env, path, q.runner))
 	return nil
 }
 
@@ -42,7 +43,7 @@ func (q *Queue) ExecuteNext() error {
 }
 
 func (q *Queue) IsEmpty() bool {
-	return len(q.queue) == 0
+	return q.current == len(q.queue)
 }
 
 func (q Queue) Finish() error {

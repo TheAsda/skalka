@@ -9,20 +9,21 @@ import (
 )
 
 type QueueProcessor struct {
-	queue  Queue
+	queue  *Queue
 	wg     sync.WaitGroup
 	logger progress_logger.ProgressLogger
 	config config.GlobalConfig
+	runner Runner
 }
 
-func NewQueueProcessor(logger progress_logger.ProgressLogger, config config.GlobalConfig) *QueueProcessor {
-	return &QueueProcessor{logger: logger, config: config, queue: nil}
+func NewQueueProcessor(logger progress_logger.ProgressLogger, config config.GlobalConfig, runner Runner) *QueueProcessor {
+	return &QueueProcessor{logger: logger, config: config, runner: runner, queue: nil}
 }
 
 func (p *QueueProcessor) FillQueue(job config.Job) error {
 	p.logger.Verbose("Filling queue")
 	tm := transaction_manager.NewTransactionManager(p.config.Workdir, job.FlushOnError)
-	queue := NewQueue(p.logger, *tm, p.config)
+	queue := NewQueue(p.logger, *tm, p.config, p.runner)
 	for _, step := range job.Steps {
 		p.logger.Verbose(fmt.Sprintf("Add step '%s' to queue", step.Name))
 		err := queue.Add(step)
@@ -30,13 +31,13 @@ func (p *QueueProcessor) FillQueue(job config.Job) error {
 			return err
 		}
 	}
-	p.queue = *queue
+	p.queue = queue
 	return nil
 }
 
 func (p *QueueProcessor) Run() {
 	p.logger.Verbose(fmt.Sprintf("Starting queue"))
-	for p.queue.IsEmpty() {
+	for !p.queue.IsEmpty() {
 		err := p.queue.ExecuteNext()
 		if err != nil {
 			p.logger.Error(err.Error())
