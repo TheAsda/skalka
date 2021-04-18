@@ -34,7 +34,7 @@ func NewProgressLogger(writer io.Writer, sett settings.Settings) *ProgressLogger
 }
 
 func (l *ProgressLogger) LogJob(jobName string) {
-	msg := fmt.Sprintf("Start job: %s", jobName)
+	msg := fmt.Sprintf("Run job: %s", jobName)
 	l.write(msg)
 }
 
