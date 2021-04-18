@@ -2,6 +2,8 @@ package queue_processor
 
 import (
 	"github.com/TheAsda/skalka/internal/progress_logger"
+	"github.com/TheAsda/skalka/internal/transaction_manager"
+	"github.com/TheAsda/skalka/internal/variables_store"
 	"github.com/TheAsda/skalka/pkg/config"
 	"github.com/TheAsda/skalka/pkg/settings"
 	"testing"
@@ -28,6 +30,8 @@ func TestQueueProcessor_FillQueue(t *testing.T) {
 		Env:     []string{},
 		Workdir: "/path/",
 	}
+	tm := transaction_manager.NewTransactionManager("/path/", false)
+	store := variables_store.NewVariablesStore()
 
 	t.Run("fill queue", func(t *testing.T) {
 		runner := NewRunnerMock()
@@ -47,7 +51,7 @@ func TestQueueProcessor_FillQueue(t *testing.T) {
 				},
 			},
 		}
-		qp := NewQueueProcessor(*progress_logger.NewProgressLogger(progress_logger.NewIOMock(), gc.Settings), gc, runner)
+		qp := NewQueueProcessor(*progress_logger.NewProgressLogger(progress_logger.NewIOMock(), gc.Settings), gc, runner, *tm, *store)
 		err := qp.FillQueue(job)
 		if err != nil {
 			t.Fatalf("Error while filling queue processor: %s", err.Error())
@@ -72,6 +76,8 @@ func TestQueueProcessor_Run(t *testing.T) {
 		Env:     []string{},
 		Workdir: "/path/",
 	}
+	tm := transaction_manager.NewTransactionManager("/path/", false)
+	store := variables_store.NewVariablesStore()
 
 	t.Run("run", func(t *testing.T) {
 		runner := NewRunnerMock()
@@ -91,7 +97,7 @@ func TestQueueProcessor_Run(t *testing.T) {
 				},
 			},
 		}
-		qp := NewQueueProcessor(*progress_logger.NewProgressLogger(progress_logger.NewIOMock(), gc.Settings), gc, runner)
+		qp := NewQueueProcessor(*progress_logger.NewProgressLogger(progress_logger.NewIOMock(), gc.Settings), gc, runner, *tm, *store)
 		err := qp.FillQueue(job)
 		if err != nil {
 			t.Fatalf("Cannot fill queue: %s", err.Error())

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/TheAsda/skalka/internal/progress_logger"
 	"github.com/TheAsda/skalka/internal/transaction_manager"
+	"github.com/TheAsda/skalka/internal/variables_store"
 	"github.com/TheAsda/skalka/pkg/config"
 	"sync"
 )
@@ -12,18 +13,19 @@ type QueueProcessor struct {
 	queue  *Queue
 	wg     sync.WaitGroup
 	logger progress_logger.ProgressLogger
-	config config.GlobalConfig
+	gc     config.GlobalConfig
 	runner Runner
+	tm     transaction_manager.TransactionManager
+	store  variables_store.VariablesStore
 }
 
-func NewQueueProcessor(logger progress_logger.ProgressLogger, config config.GlobalConfig, runner Runner) *QueueProcessor {
-	return &QueueProcessor{logger: logger, config: config, runner: runner, queue: nil}
+func NewQueueProcessor(logger progress_logger.ProgressLogger, config config.GlobalConfig, runner Runner, manager transaction_manager.TransactionManager, store variables_store.VariablesStore) *QueueProcessor {
+	return &QueueProcessor{logger: logger, gc: config, runner: runner, queue: nil, tm: manager, store: store}
 }
 
 func (p *QueueProcessor) FillQueue(job config.Job) error {
 	p.logger.Verbose("Filling queue")
-	tm := transaction_manager.NewTransactionManager(p.config.Workdir, job.FlushOnError)
-	queue := NewQueue(p.logger, *tm, p.config, p.runner)
+	queue := NewQueue(p.logger, p.tm, p.gc, p.runner)
 	for _, step := range job.Steps {
 		p.logger.Verbose(fmt.Sprintf("Add step '%s' to queue", step.Name))
 		err := queue.Add(step)

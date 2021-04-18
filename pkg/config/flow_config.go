@@ -18,8 +18,11 @@ type Requirement struct {
 	Cmd string
 }
 
+// The name of a job
+type JobName = string
+
 // Collection of names and workflows
-type Jobs = map[string]Job
+type Jobs = map[JobName]Job
 
 // Configuration actions and configurations for current workflow
 type Job struct {
