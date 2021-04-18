@@ -21,10 +21,13 @@ type TransactionManager struct {
 }
 
 func NewTransactionManager(path string, isTmp bool) *TransactionManager {
-	return &TransactionManager{targetPath: path, isTmp: isTmp, tmpPath: os.TempDir()}
+	return &TransactionManager{targetPath: path, isTmp: isTmp, tmpPath: os.TempDir(), tmpTargetPath: ""}
 }
 
 func (m *TransactionManager) getTempDir() (string, error) {
+	if m.tmpTargetPath != "" {
+		return m.tmpTargetPath, nil
+	}
 	rand.Seed(time.Now().UnixNano())
 	folderName := rand.Int()
 	m.tmpTargetPath = path.Join(m.tmpPath, strconv.Itoa(folderName))

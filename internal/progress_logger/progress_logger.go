@@ -8,11 +8,10 @@ import (
 
 type ProgressLogger struct {
 	writer   io.Writer
-	reader   io.Reader
 	logLevel MessageType
 }
 
-func NewProgressLogger(writer io.Writer, reader io.Reader, sett settings.Settings) *ProgressLogger {
+func NewProgressLogger(writer io.Writer, sett settings.Settings) *ProgressLogger {
 	logLevel := Warn
 	switch sett.LogLevel {
 	case settings.Error:
@@ -31,61 +30,54 @@ func NewProgressLogger(writer io.Writer, reader io.Reader, sett settings.Setting
 		logLevel = Verbose
 		break
 	}
-	return &ProgressLogger{writer: writer, reader: reader, logLevel: logLevel}
+	return &ProgressLogger{writer: writer, logLevel: logLevel}
 }
 
-func (l *ProgressLogger) LogJob(jobName string) error {
+func (l *ProgressLogger) LogJob(jobName string) {
 	msg := fmt.Sprintf("Start job: %s", jobName)
-	err := l.write(msg)
-	return err
+	l.write(msg)
 }
 
-func (l *ProgressLogger) LogStep(current int, total int, name string) error {
+func (l *ProgressLogger) LogStep(current int, total int, name string) {
 	msg := fmt.Sprintf("[%d/%d] %s", current, total, name)
-	err := l.write(msg)
-	return err
+	l.write(msg)
 }
 
-func (l *ProgressLogger) Error(message string) error {
+func (l *ProgressLogger) Error(message string) {
 	msg := l.formatLog(Error, message)
-	err := l.write(msg)
-	return err
+	l.write(msg)
 }
 
-func (l *ProgressLogger) Warn(message string) error {
+func (l *ProgressLogger) Warn(message string) {
 	if l.logLevel < Warn {
-		return nil
+		return
 	}
 	msg := l.formatLog(Warn, message)
-	err := l.write(msg)
-	return err
+	l.write(msg)
 }
 
-func (l *ProgressLogger) Info(message string) error {
+func (l *ProgressLogger) Info(message string) {
 	if l.logLevel < Info {
-		return nil
+		return
 	}
 	msg := l.formatLog(Info, message)
-	err := l.write(msg)
-	return err
+	l.write(msg)
 }
 
-func (l *ProgressLogger) Debug(message string) error {
+func (l *ProgressLogger) Debug(message string) {
 	if l.logLevel < Debug {
-		return nil
+		return
 	}
 	msg := l.formatLog(Debug, message)
-	err := l.write(msg)
-	return err
+	l.write(msg)
 }
 
-func (l *ProgressLogger) Verbose(message string) error {
+func (l *ProgressLogger) Verbose(message string) {
 	if l.logLevel < Verbose {
-		return nil
+		return
 	}
 	msg := l.formatLog(Verbose, message)
-	err := l.write(msg)
-	return err
+	l.write(msg)
 }
 
 func (l *ProgressLogger) GetStdout() io.Writer {
@@ -96,24 +88,26 @@ func (l *ProgressLogger) GetStderr() io.Writer {
 	return l.writer
 }
 
-func (l *ProgressLogger) write(message string) error {
+func (l *ProgressLogger) write(message string) {
 	_, err := l.writer.Write([]byte(message))
-	return err
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (l *ProgressLogger) formatLog(messageType MessageType, message string) string {
 	var format string
 	switch messageType {
 	case Info:
-		format = "Info: %s"
+		format = "[INFO]: %s"
 	case Warn:
-		format = "Warn: %s"
+		format = "[WARN]: %s"
 	case Error:
-		format = "Error: %s"
+		format = "[ERROR]: %s"
 	case Debug:
-		format = "Debug: %s"
+		format = "[DEBUG]: %s"
 	case Verbose:
-		format = "Verbose: %s"
+		format = "[VERBOSE]: %s"
 	default:
 		panic("Unknown message type")
 	}

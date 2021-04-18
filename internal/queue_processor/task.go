@@ -13,6 +13,7 @@ type Task struct {
 	stderr  io.Writer
 	env     config.Env
 	dir     string
+	// TODO: add variables store
 }
 
 func NewTask(name string, command string, stdout io.Writer, stderr io.Writer, env config.Env, dir string) *Task {
