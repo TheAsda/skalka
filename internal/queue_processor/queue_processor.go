@@ -15,6 +15,10 @@ type QueueProcessor struct {
 	config config.GlobalConfig
 }
 
+func NewQueueProcessor(logger progress_logger.ProgressLogger, config config.GlobalConfig) *QueueProcessor {
+	return &QueueProcessor{logger: logger, config: config, queues: map[string]Queue{}}
+}
+
 func (p *QueueProcessor) FillQueues(jobs config.Jobs) error {
 	p.logger.Verbose("Filling queues")
 	for name, job := range jobs {
