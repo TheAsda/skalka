@@ -27,7 +27,7 @@ func (q *Queue) Add(step config.Step) error {
 		q.logger.Error(err.Error())
 		return err
 	}
-	q.queue = append(q.queue, *NewTask(step.Name, step.Run, q.logger.GetStdout(), q.logger.GetStderr(), env, path, q.runner))
+	q.queue = append(q.queue, *NewTask(step.Name, step.Run, env, path, q.runner))
 	return nil
 }
 

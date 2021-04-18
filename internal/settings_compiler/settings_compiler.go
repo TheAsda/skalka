@@ -9,10 +9,10 @@ import (
 type SettingsCompiler struct {
 	Settings     settings.Settings
 	settingsPath string
-	reader       fs.FileReader
+	reader       fs.PathReader
 }
 
-func NewSettingsCompiler(settingsPath string, reader fs.FileReader) *SettingsCompiler {
+func NewSettingsCompiler(settingsPath string, reader fs.PathReader) *SettingsCompiler {
 	return &SettingsCompiler{settingsPath: settingsPath, reader: reader}
 }
 

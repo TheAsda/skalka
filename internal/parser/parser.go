@@ -7,10 +7,10 @@ import (
 )
 
 type Parser struct {
-	reader fs.FileReader
+	reader fs.PathReader
 }
 
-func NewParser(reader fs.FileReader) *Parser {
+func NewParser(reader fs.PathReader) *Parser {
 	return &Parser{reader: reader}
 }
 
