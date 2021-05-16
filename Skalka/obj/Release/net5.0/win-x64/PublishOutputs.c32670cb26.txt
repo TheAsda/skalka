@@ -1,0 +1,6 @@
+D:\Andrey\Programming\C#\Skalka\build\Skalka.pdb
+D:\Andrey\Programming\C#\Skalka\build\clrcompression.dll
+D:\Andrey\Programming\C#\Skalka\build\clrjit.dll
+D:\Andrey\Programming\C#\Skalka\build\coreclr.dll
+D:\Andrey\Programming\C#\Skalka\build\mscordaccore.dll
+D:\Andrey\Programming\C#\Skalka\build\Skalka.exe
