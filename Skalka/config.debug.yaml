@@ -1,0 +1,19 @@
+﻿version: 0
+env:
+  - NODE_ENV=production
+jobs:
+  main:
+    steps:
+      - name: Check npm version 1
+        run: npm --version
+      - name: Check node version 1
+        run: node --version
+  golang:
+    steps:
+      - name: Check npm version 2
+        run: npm --version
+      - name: Check node version 2
+        run: node --version
+
+
+      
